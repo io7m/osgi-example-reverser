@@ -1,0 +1,13 @@
+(org.osgi.framework.PackagePermission "com.io7m.reverser.api" "import")
+(org.osgi.framework.PackagePermission "org.slf4j" "import")
+(org.osgi.framework.ServicePermission "com.io7m.reverser.*" "GET")
+(org.osgi.framework.CapabilityPermission "osgi.extender" "require")
+
+# Logback
+(java.lang.RuntimePermission "getClassLoader" "*")
+(java.util.PropertyPermission "os.name" "read")
+(java.util.PropertyPermission "line.separator" "read")
+
+# Server
+(java.net.SocketPermission "*" "listen,accept,resolve")
+(java.lang.RuntimePermission "modifyThread")
