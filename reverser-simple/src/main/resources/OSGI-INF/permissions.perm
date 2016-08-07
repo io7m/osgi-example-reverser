@@ -1,0 +1,8 @@
+# The implementation is allowed to import the API
+(org.osgi.framework.PackagePermission "com.io7m.reverser.api" "import")
+
+# Required for Declarative Services
+(org.osgi.framework.CapabilityPermission "osgi.extender" "require")
+
+# The implementation is allowed to register a service as an implementation of the API
+(org.osgi.framework.ServicePermission "com.io7m.reverser.api.ReverserServiceType" "REGISTER")

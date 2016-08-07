@@ -2,8 +2,8 @@
 (org.osgi.framework.PackagePermission "com.io7m.reverser.api" "import")
 (org.osgi.framework.PackagePermission "org.slf4j" "import")
 
-# The implementation is allowed to fetch any implementation of the reverser API
-(org.osgi.framework.ServicePermission "com.io7m.reverser.*" "GET")
+# The implementation is allowed to register a service as an implementation of the API
+(org.osgi.framework.ServicePermission "com.io7m.reverser.api.ReverserServiceType" "REGISTER")
 
 # Required for Declarative Services
 (org.osgi.framework.CapabilityPermission "osgi.extender" "require")
@@ -14,5 +14,5 @@
 (java.util.PropertyPermission "line.separator" "read")
 
 # Server
-(java.net.SocketPermission "*" "listen,accept,resolve")
+(java.net.SocketPermission "*" "connect,resolve")
 (java.lang.RuntimePermission "modifyThread")
