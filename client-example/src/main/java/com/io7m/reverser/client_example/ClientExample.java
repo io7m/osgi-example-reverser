@@ -52,7 +52,7 @@ public final class ClientExample
       } catch (final Exception e) {
         ClientExample.LOG.error("{}: client error: ", this, e);
       } finally {
-        context.disableComponent(ClientExample.class.getCanonicalName());
+        context.disableComponent(this.getClass().getName());
       }
     });
     this.thread.setName("client-example-" + this.thread.getId());
