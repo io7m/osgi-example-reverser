@@ -51,9 +51,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>
-              com.io7m.reverser.tcp_client
-            </Export-Package>
+            <Export-Package></Export-Package>
           </instructions>
         </configuration>
       </plugin>
