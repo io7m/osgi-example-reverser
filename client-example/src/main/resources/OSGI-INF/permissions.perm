@@ -1,9 +1,13 @@
 # The implementation is allowed to import packages it needs
 (org.osgi.framework.PackagePermission "com.io7m.reverser.api" "import")
 (org.osgi.framework.PackagePermission "org.slf4j" "import")
+(org.osgi.framework.PackagePermission "org.osgi.service.component" "import")
 
 # The implementation is allowed to fetch any implementation of the reverser API
 (org.osgi.framework.ServicePermission "com.io7m.reverser.*" "GET")
 
 # Required for Declarative Services
 (org.osgi.framework.CapabilityPermission "osgi.extender" "require")
+
+# Example
+(java.lang.RuntimePermission "modifyThread")

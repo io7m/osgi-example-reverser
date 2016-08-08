@@ -1,5 +1,6 @@
 # The implementation is allowed to import the packages it needs
 (org.osgi.framework.PackagePermission "com.io7m.reverser.api" "import")
+(org.osgi.framework.PackagePermission "com.io7m.reverser.backoff" "import")
 (org.osgi.framework.PackagePermission "org.slf4j" "import")
 
 # The implementation is allowed to register a service as an implementation of the API
@@ -13,6 +14,6 @@
 (java.util.PropertyPermission "os.name" "read")
 (java.util.PropertyPermission "line.separator" "read")
 
-# Server
+# Client
 (java.net.SocketPermission "*" "connect,resolve")
 (java.lang.RuntimePermission "modifyThread")

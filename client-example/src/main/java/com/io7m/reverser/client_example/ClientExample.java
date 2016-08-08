@@ -1,6 +1,7 @@
 package com.io7m.reverser.client_example;
 
 import com.io7m.reverser.api.ReverserServiceType;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -35,7 +36,7 @@ public final class ClientExample
   }
 
   @Activate
-  private void activate()
+  private void activate(final ComponentContext context)
   {
     ClientExample.LOG.debug("starting client example");
 
@@ -56,6 +57,8 @@ public final class ClientExample
         ClientExample.LOG.debug("{}: finished", this);
       } catch (final Exception e) {
         ClientExample.LOG.error("{}: client error: ", this, e);
+      } finally {
+        context.disableComponent(ClientExample.class.getCanonicalName());
       }
     });
   }

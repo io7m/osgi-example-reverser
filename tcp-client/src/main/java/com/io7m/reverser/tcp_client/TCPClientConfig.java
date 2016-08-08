@@ -1,6 +1,6 @@
 package com.io7m.reverser.tcp_client;
 
-public @interface ClientConfig
+public @interface TCPClientConfig
 {
   String host() default "127.0.0.1";
 

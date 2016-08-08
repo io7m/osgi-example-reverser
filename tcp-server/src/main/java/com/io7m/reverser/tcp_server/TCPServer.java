@@ -1,6 +1,7 @@
 package com.io7m.reverser.tcp_server;
 
 import com.io7m.reverser.api.ReverserServiceType;
+import com.io7m.reverser.backoff.ExponentialBackoff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +43,21 @@ public final class TCPServer implements Closeable, Runnable
       return th;
     });
 
-    this.socket = new ServerSocket();
-    this.socket.setReuseAddress(true);
-    this.socket.setSoTimeout(1000);
-    this.socket.bind(this.address);
+    this.socket = ExponentialBackoff.tryRepeatedly(5, () -> {
+      ServerSocket s = null;
+      try {
+        s = new ServerSocket();
+        s.setReuseAddress(true);
+        s.setSoTimeout(1000);
+        s.bind(this.address);
+        return s;
+      } catch (final IOException e) {
+        if (s != null) {
+          s.close();
+        }
+        throw e;
+      }
+    }, e -> TCPServer.LOG.error("error attempting to bind: ", e));
   }
 
   @Override
