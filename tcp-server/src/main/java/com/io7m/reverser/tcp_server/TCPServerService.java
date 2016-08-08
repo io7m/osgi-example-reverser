@@ -55,7 +55,7 @@ public final class TCPServerService
     throws IOException
   {
     TCPServerService.LOG.info("shutting down server");
-    this.server.stop();
+    this.server.close();
     this.thread.interrupt();
   }
 }

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class TCPServer implements Runnable
+public final class TCPServer implements Closeable, Runnable
 {
   private static final Logger LOG;
 
@@ -29,10 +30,12 @@ public final class TCPServer implements Runnable
   private final ExecutorService client_pool;
   private final ReverserServiceType reverser;
   private volatile boolean stop;
+  private ServerSocket socket;
 
   public TCPServer(
     final InetSocketAddress address,
     final ReverserServiceType reverser)
+    throws IOException
   {
     this.address = address;
     this.reverser = reverser;
@@ -41,12 +44,11 @@ public final class TCPServer implements Runnable
       th.setName("tcp-server-client-" + th.getId());
       return th;
     });
-  }
 
-  public void stop()
-  {
-    this.stop = true;
-    this.client_pool.shutdown();
+    this.socket = new ServerSocket();
+    this.socket.setReuseAddress(true);
+    this.socket.setSoTimeout(1000);
+    this.socket.bind(this.address);
   }
 
   @Override
@@ -54,27 +56,30 @@ public final class TCPServer implements Runnable
   {
     TCPServer.LOG.debug("starting server: {}", this.address);
 
-    try (final ServerSocket socket = new ServerSocket()) {
-      socket.setReuseAddress(true);
-      socket.setSoTimeout(1000);
-      socket.bind(this.address);
-
-      while (!this.stop) {
-        try {
-          final Socket client = socket.accept();
-          TCPServer.LOG.debug("client: {}", client.getRemoteSocketAddress());
-          this.client_pool.execute(new Client(client));
-        } catch (final SocketTimeoutException e) {
-          // Ignore accept timeout
-        } catch (final IOException e) {
+    while (!this.stop) {
+      try {
+        final Socket client = this.socket.accept();
+        TCPServer.LOG.debug("client: {}", client.getRemoteSocketAddress());
+        this.client_pool.execute(new Client(client));
+      } catch (final SocketTimeoutException e) {
+        // Ignore accept timeout
+      } catch (final IOException e) {
+        if (!this.socket.isClosed()) {
           TCPServer.LOG.error("server I/O error: ", e);
         }
       }
-
-      TCPServer.LOG.info("shutdown request received");
-    } catch (final IOException e) {
-      TCPServer.LOG.error("could not start server: ", e);
     }
+
+    TCPServer.LOG.info("shutdown request received");
+  }
+
+  @Override
+  public void close()
+    throws IOException
+  {
+    this.stop = true;
+    this.client_pool.shutdown();
+    this.socket.close();
   }
 
   private final class Client implements Runnable
