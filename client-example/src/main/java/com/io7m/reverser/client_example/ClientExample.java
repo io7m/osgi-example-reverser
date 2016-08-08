@@ -21,8 +21,8 @@ public final class ClientExample
     LOG = LoggerFactory.getLogger(ClientExample.class);
   }
 
-  private ExecutorService exec;
   private ReverserServiceType reverser;
+  private Thread thread;
 
   public ClientExample()
   {
@@ -40,13 +40,7 @@ public final class ClientExample
   {
     ClientExample.LOG.debug("starting client example");
 
-    this.exec = Executors.newFixedThreadPool(1, r -> {
-      final Thread th = new Thread(r);
-      th.setName("client-example");
-      return th;
-    });
-
-    this.exec.execute(() -> {
+    this.thread = new Thread(() -> {
       try {
         ClientExample.LOG.debug("{}: sending", this);
         System.out.println(this.reverser.reversed("Message One"));
@@ -61,12 +55,16 @@ public final class ClientExample
         context.disableComponent(ClientExample.class.getCanonicalName());
       }
     });
+    this.thread.setName("client-example-" + this.thread.getId());
+    this.thread.start();
   }
 
   @Deactivate
   private void deactivate()
+    throws InterruptedException
   {
     ClientExample.LOG.debug("{}: stopping client example", this);
-    this.exec.shutdown();
+    this.thread.interrupt();
+    this.thread.join();
   }
 }
